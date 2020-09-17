@@ -1,7 +1,7 @@
 package controllers;
 
 import java.io.IOException;
-import java.sql.Timestamp;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
@@ -33,27 +33,11 @@ public class NewServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		EntityManager em = DBUtil.createEntityManager();
-        em.getTransaction().begin();
 
-        // Messageのインスタンスを生成
-        Message m = new Message();
-
-        // mの各プロパティにデータを代入
-        String content = "hello";
-        m.setContent(content);
-
-        Timestamp currentTime = new Timestamp(System.currentTimeMillis());     // 現在の日時を取得
-        m.setCreated_at(currentTime);
-        m.setUpdated_at(currentTime);
-
-        // データベースに保存
-        em.persist(m);
-        em.getTransaction().commit();
-
-        // 自動採番されたIDの値を表示
-        response.getWriter().append(Integer.valueOf(m.getId()).toString());
+        List<Message> messages = em.createNamedQuery("getAllMessages", Message.class)
+                                   .getResultList();
+        response.getWriter().append(Integer.valueOf(messages.size()).toString());
 
         em.close();
-	}
-
+    }
 }
